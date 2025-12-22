@@ -1,0 +1,63 @@
+networks:
+  odoo-net:
+
+services:
+  db:
+    image: postgres:16
+    container_name: odoo-db
+    networks: [odoo-net]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-odoo} -d ${POSTGRES_DB:-odoo}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  odoo:
+    image: odoo:19.0
+    container_name: odoo-app
+    networks: [odoo-net]
+    depends_on:
+      - db
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    environment:
+      HOST: ${DB_HOST:-db}
+      PORT: ${DB_PORT:-5432}
+      USER: ${POSTGRES_USER}
+      PASSWORD: ${POSTGRES_PASSWORD}
+      ADMIN_PASSWD: ${ADMIN_PASSWD}
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+          cpus: "2.0"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8069/web/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  odoo_data:
