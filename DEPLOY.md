@@ -11,49 +11,70 @@
 
 ## Initial Setup
 
-1. **Clone the repository:**
+### Production Deployment (Recommended)
 
+1. **Clone the repository:**
    ```bash
    git clone <your-repo-url>
    cd odoo
    ```
 
-2. **Configure environment:**
-
+2. **Run automated deployment:**
    ```bash
-   cp .env.example .env
-   # Edit .env with your credentials:
-   # - POSTGRES_PASSWORD: Strong database password
-   # - ADMIN_PASSWD: Strong Odoo master password
+   ./deploy.sh
    ```
 
-3. **Start services:**
+   This script will:
+   - Check prerequisites (Docker, Docker Compose)
+   - Create `.env` from template if needed
+   - Pull latest Docker images
+   - Start services with health checks
+   - Wait for Odoo to be ready
+   - Confirm everything is working
 
+3. **Access Odoo:**
+   - URL: http://localhost:8069
+   - Create your database via web interface
+
+### Development Setup (Quick)
+
+1. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your credentials if needed
+   ```
+
+2. **Start services:**
    ```bash
    docker compose up -d
    ```
 
-4. **Access Odoo:**
+3. **Access Odoo:**
    - URL: http://localhost:8069
-   - Create your first database via web interface
+   - Create your database via web interface
 
 ## Docker Commands
 
-### Basic Operations
-
+### Production Operations
 ```bash
-# Start services
-docker compose up -d
+# Automated deployment (recommended)
+./deploy.sh
 
 # Stop services
 docker compose down
 
-# Restart Odoo only
-docker compose restart odoo
-
 # View logs
 docker compose logs -f odoo
 docker compose logs -f db
+```
+
+### Development Operations
+```bash
+# Quick start
+docker compose up -d
+
+# Restart Odoo only
+docker compose restart odoo
 
 # Check status
 docker compose ps
@@ -136,10 +157,14 @@ docker inspect odoo-db --format='{{.State.Health.Status}}'
 ### Reset Environment
 
 ```bash
-# Stop and remove everything
-docker compose down -v
+# Stop and remove everything (containers, volumes, networks)
+docker compose down -v --remove-orphans
+
+# Clean unused Docker resources
 docker system prune -f
 
-# Start fresh
-docker compose up -d
+# Start fresh installation
+./deploy.sh
 ```
+
+**Note:** The `-v` flag removes all data volumes, completely resetting the database and Odoo data.

@@ -61,4 +61,9 @@
 
 ## Deployment
 
+For automated production deployment:
+```bash
+./deploy.sh
+```
+
 For detailed deployment instructions, database access, and production setup, see [DEPLOY.md](DEPLOY.md).
