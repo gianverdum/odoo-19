@@ -44,6 +44,11 @@
 ✅ **Portuguese (Brazil) Localization:**
 - l10n-brazil
 
+## Custom Addons Installed
+
+✅ **UI/UX:**
+- muk_web_theme
+
 ## Post-Setup Actions Required
 
 1. **Activate Developer Mode** in Odoo
